@@ -1,0 +1,12 @@
+# OS / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# VS Code / Cursor
+.vscode/
+.cursor/
+
+# Logs
+*.log
+

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Семейный бюджет</title>
+  <meta name="description" content="Простой сайт для семейного бюджета: учёт доходов и расходов, экспорт CSV, графики и прогноз расходов.">
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.10);
+      --text: #eef2ff;
+      --muted: rgba(238, 242, 255, 0.72);
+      --accent: #7c3aed;
+      --accent2: #22c55e;
+      --radius: 18px;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(124, 58, 237, 0.35), transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, rgba(34, 197, 94, 0.22), transparent 60%),
+        radial-gradient(1000px 700px at 40% 90%, rgba(59, 130, 246, 0.18), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    .wrap {
+      width: min(1100px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 44px 0 70px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 46px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 1), rgba(34, 197, 94, 1));
+      box-shadow: 0 10px 26px rgba(124, 58, 237, 0.28);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .pill:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.18);
+      text-decoration: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr 0.9fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .title {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .lead {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 60ch;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover { transform: translateY(-1px); text-decoration: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 1), rgba(59, 130, 246, 1));
+      color: #fff;
+      box-shadow: 0 16px 40px rgba(124, 58, 237, 0.22);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.14);
+      color: var(--text);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .stat {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.95);
+      box-shadow: 0 10px 22px rgba(34, 197, 94, 0.22);
+    }
+
+    .stat b { display: block; font-size: 14px; }
+    .stat span { display: block; color: var(--muted); font-size: 13px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .feature h3 { margin: 0 0 6px; font-size: 16px; }
+    .feature p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .footer {
+      margin-top: 40px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      color: rgba(238, 242, 255, 0.70);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="nav">
+      <div class="brand">
+        <span class="brand-badge" aria-hidden="true"></span>
+        <span>Семейный бюджет</span>
+      </div>
+      <nav class="nav-links" aria-label="Навигация">
+        <!-- Ссылка на приложение бюджета (сохранён текущий файл с функционалом) -->
+        <a class="pill" href="калькулятор.html">Открыть бюджет</a>
+        <a class="pill" href="#features">Возможности</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="card">
+        <h1 class="title">Удобный учёт доходов и расходов для семьи.</h1>
+        <p class="lead">Добавляйте операции, фильтруйте список, смотрите графики и прогноз расходов до конца месяца. Данные сохраняются в браузере на вашем устройстве.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="калькулятор.html">Запустить калькулятор бюджета</a>
+          <a class="btn btn-secondary" href="#features">Посмотреть возможности</a>
+        </div>
+      </div>
+
+      <aside class="card" aria-label="Кратко">
+        <div class="stats">
+          <div class="stat">
+            <span class="dot" aria-hidden="true"></span>
+            <div>
+              <b>Графики и прогноз</b>
+              <span>Категории, месяцы, баланс и прогноз трат.</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="dot" style="background: rgba(124, 58, 237, 0.95);" aria-hidden="true"></span>
+            <div>
+              <b>Экспорт CSV</b>
+              <span>Быстро выгрузить операции в таблицу.</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="dot" style="background: rgba(59, 130, 246, 0.95);" aria-hidden="true"></span>
+            <div>
+              <b>Светлая / розовая тема</b>
+              <span>Переключатель в правом нижнем углу.</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid" id="features" aria-label="Возможности">
+      <div class="card feature">
+        <h3>Быстро добавлять операции</h3>
+        <p>Сумма, категория, дата и тип (доход/расход) — и запись сразу попадает в список.</p>
+      </div>
+      <div class="card feature">
+        <h3>Понимать картину по месяцам</h3>
+        <p>Отдельный график сравнивает доходы и расходы по месяцам, плюс есть динамика баланса.</p>
+      </div>
+      <div class="card feature">
+        <h3>Планировать расходы</h3>
+        <p>Прогноз до конца месяца строится по средним ежедневным тратам аналогичного периода прошлого месяца.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>© Семейный бюджет</span>
+      <span>Локальные данные: сохраняются в браузере (localStorage).</span>
+    </footer>
+  </div>
+</body>
+</html>
