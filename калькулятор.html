@@ -73,10 +73,35 @@ h1 {
 
 .topbar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     gap: 10px;
     margin-top: 10px;
+}
+
+.nav-lite {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav-lite a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-soft);
+    background: var(--bg-card);
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.nav-lite a:hover {
+    opacity: 0.9;
 }
 
 .topbar label {
@@ -211,12 +236,19 @@ canvas {
 
 <!-- 🔹 Валюта оформления (₽ / $ / €) -->
 <div class="topbar">
-    <label for="currency">Валюта:</label>
-    <select id="currency" class="currency-select" onchange="setCurrencyFromUI()">
-        <option value="RUB">₽ RUB</option>
-        <option value="USD">$ USD</option>
-        <option value="EUR">€ EUR</option>
-    </select>
+    <!-- Лёгкая навигация по проекту -->
+    <div class="nav-lite">
+        <a href="index.html">← На главную</a>
+        <a href="app/budget/">Бюджет</a>
+    </div>
+    <div>
+        <label for="currency">Валюта:</label>
+        <select id="currency" class="currency-select" onchange="setCurrencyFromUI()">
+            <option value="RUB">₽ RUB</option>
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+        </select>
+    </div>
 </div>
 
 <div class="balance">
