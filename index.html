@@ -5,16 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Семейный бюджет</title>
   <meta name="description" content="Простой сайт для семейного бюджета: учёт доходов и расходов, экспорт CSV, графики и прогноз расходов.">
+  <!-- Тема лендинга: по умолчанию светлая; для тёмной темы выставляем data-theme="dark" на <html> -->
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("landingTheme") === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      } catch (e) { /* localStorage недоступен — остаётся тема по умолчанию */ }
+    })();
+  </script>
   <style>
     :root {
+      /* Светлая тема (по умолчанию) */
+      --bg: #f6f7fb;
+      --card: rgba(255, 255, 255, 0.85);
+      --border: rgba(12, 18, 32, 0.10);
+      --text: #0b1220;
+      --muted: rgba(11, 18, 32, 0.72);
+      --accent: #7c3aed;
+      --accent2: #22c55e;
+      --radius: 18px;
+      --shadow: 0 18px 50px rgba(11, 18, 32, 0.12);
+    }
+
+    /* Тёмная тема */
+    [data-theme="dark"] {
       --bg: #0b1220;
       --card: rgba(255, 255, 255, 0.06);
       --border: rgba(255, 255, 255, 0.10);
       --text: #eef2ff;
       --muted: rgba(238, 242, 255, 0.72);
-      --accent: #7c3aed;
-      --accent2: #22c55e;
-      --radius: 18px;
       --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
     }
 
@@ -24,12 +45,13 @@
       margin: 0;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(124, 58, 237, 0.35), transparent 60%),
-        radial-gradient(900px 500px at 80% 20%, rgba(34, 197, 94, 0.22), transparent 60%),
-        radial-gradient(1000px 700px at 40% 90%, rgba(59, 130, 246, 0.18), transparent 60%),
+        radial-gradient(1200px 600px at 10% 10%, rgba(124, 58, 237, 0.18), transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, rgba(34, 197, 94, 0.14), transparent 60%),
+        radial-gradient(1000px 700px at 40% 90%, rgba(59, 130, 246, 0.12), transparent 60%),
         var(--bg);
       color: var(--text);
       line-height: 1.6;
+      transition: background-color 0.35s ease, color 0.35s ease;
     }
 
     a { color: inherit; text-decoration: none; }
@@ -77,7 +99,7 @@
       padding: 10px 14px;
       border-radius: 999px;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--card);
       color: var(--muted);
       font-weight: 600;
       font-size: 14px;
@@ -85,7 +107,7 @@
 
     .pill:hover {
       color: var(--text);
-      border-color: rgba(255, 255, 255, 0.18);
+      border-color: color-mix(in srgb, var(--border) 60%, var(--text));
       text-decoration: none;
     }
 
@@ -155,8 +177,8 @@
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.14);
+      background: var(--card);
+      border-color: var(--border);
       color: var(--text);
     }
 
@@ -173,8 +195,8 @@
       align-items: center;
       padding: 14px 14px;
       border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      background: var(--card);
     }
 
     .dot {
@@ -205,8 +227,8 @@
     .footer {
       margin-top: 40px;
       padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.10);
-      color: rgba(238, 242, 255, 0.70);
+      border-top: 1px solid var(--border);
+      color: var(--muted);
       font-size: 13px;
       display: flex;
       align-items: center;
@@ -214,6 +236,27 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+
+    /* Кнопка переключения темы: правый нижний угол */
+    .theme-toggle {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      z-index: 1000;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      transition: transform 0.15s ease, filter 0.2s ease;
+    }
+
+    .theme-toggle:hover { transform: translateY(-1px); }
+    .theme-toggle:active { transform: translateY(0); }
   </style>
 </head>
 <body>
@@ -287,5 +330,47 @@
       <span>Локальные данные: сохраняются в браузере (localStorage).</span>
     </footer>
   </div>
+
+  <!-- Кнопка переключения темы: светлая ↔ тёмная -->
+  <button type="button" id="themeToggle" class="theme-toggle" title="Переключить тему">🌙 Тёмная тема</button>
+
+  <script>
+    const LANDING_THEME_KEY = "landingTheme";
+
+    function getLandingTheme() {
+      return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    }
+
+    function setLandingTheme(theme) {
+      if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+      else document.documentElement.removeAttribute("data-theme");
+      try { localStorage.setItem(LANDING_THEME_KEY, theme); } catch (e) { /* игнорируем */ }
+      updateLandingThemeToggle();
+    }
+
+    function updateLandingThemeToggle() {
+      const btn = document.getElementById("themeToggle");
+      if (!btn) return;
+      if (getLandingTheme() === "dark") {
+        btn.textContent = "☀️ Светлая тема";
+        btn.title = "Переключить на светлую тему";
+      } else {
+        btn.textContent = "🌙 Тёмная тема";
+        btn.title = "Переключить на тёмную тему";
+      }
+    }
+
+    (function initLandingTheme() {
+      try {
+        const saved = localStorage.getItem(LANDING_THEME_KEY);
+        if (saved === "dark") document.documentElement.setAttribute("data-theme", "dark");
+        if (saved === "light") document.documentElement.removeAttribute("data-theme");
+      } catch (e) { /* localStorage недоступен */ }
+      updateLandingThemeToggle();
+      document.getElementById("themeToggle").addEventListener("click", function () {
+        setLandingTheme(getLandingTheme() === "dark" ? "light" : "dark");
+      });
+    })();
+  </script>
 </body>
 </html>
